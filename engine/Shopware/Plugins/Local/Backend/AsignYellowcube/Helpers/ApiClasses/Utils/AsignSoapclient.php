@@ -1,0 +1,112 @@
+<?php
+
+/**
+ * This file extends SOAP features and functions
+ *
+ * PHP version 5
+ *
+ * @category  asign
+ * @package   AsignYellowcube
+ * @author    entwicklung@a-sign.ch
+ * @copyright A-Sign
+ * @license   https://www.a-sign.ch/
+ * @version   2.1
+ * @link      https://www.a-sign.ch/
+ * @see       AsignSoapclient
+ * @since     File available since Release 1.0
+ */
+
+namespace Shopware\AsignYellowcube\Helpers\ApiClasses\Utils;
+
+use Shopware\AsignYellowcube\Components\Api\WSSESoap;
+use Shopware\AsignYellowcube\Components\Api\XMLSecurityKey;
+use Shopware\AsignYellowcube\Helpers\ApiClasses\AsignSoapClientApi;
+
+/**
+ * Extends SOAP features and functions
+ *
+ * @category A-Sign
+ * @package  AsignYellowcube
+ * @author   entwicklung@a-sign.ch
+ * @link     http://www.a-sign.ch
+ */
+class AsignSoapclient extends \SoapClient {
+	/**
+	 * @var array Soap client options.
+	 */
+	protected $options = [];
+
+	/**
+	 * @var string Loaded certificate.
+	 */
+	protected $certificateContent;
+
+	/**
+	 * @var bool Use certifiate or not
+	 */
+	protected $useCertificate;
+
+	/**
+	 * @param mixed $wsdl
+	 * @param array $options
+	 */
+	public function __construct( $wsdl, $options ) {
+		$oSoap                = new AsignSoapClientApi();
+		$this->useCertificate = $oSoap->useCertificateForAllModes();
+
+		$this->options = $options;
+		parent::__construct( $wsdl, $this->options );
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function __doRequest( $request, $location, $action, $version, $oneWay = null ) {
+		if ( $this->useCertificate ) {
+			return $this->signRequest( $request, $location, $action, $version, $oneWay );
+		}
+
+		return parent::__doRequest( $request, $location, $action, $version, $oneWay );
+	}
+
+	/**
+	 * Signs the specified request.
+	 *
+	 * @param      $request
+	 * @param      $location
+	 * @param      $action
+	 * @param      $version
+	 * @param null $oneWay
+	 *
+	 * @return string
+	 * @throws \Exception
+	 */
+	protected function signRequest( $request, $location, $action, $version, $oneWay = null ) {
+		$doc = new \DOMDocument();
+		$doc->loadXML( $request );
+
+		$wsse = new WSSESoap( $doc );
+		$wsse->addTimestamp();
+
+		$key = new XMLSecurityKey( XMLSecurityKey::RSA_SHA1, [ 'type' => 'private' ] );
+		$key->loadKey( $this->getCertificateContent() );
+		$wsse->signSoapDoc( $key );
+
+		$token = $wsse->addBinaryToken( $this->getCertificateContent() );
+		$wsse->attachTokentoSig( $token );
+
+		$signedRequest = $wsse->saveXML();
+
+		return parent::__doRequest( $signedRequest, $location, $action, $version, $oneWay );
+
+	}
+
+	/**
+	 * Returns content of the certificate passed  in 'local_cert'.
+	 *
+	 * @return string Content of the certificate passed  in 'local_cert'.
+	 */
+	protected function getCertificateContent() {
+		return file_get_contents( $this->options['local_cert'] );
+	}
+}
