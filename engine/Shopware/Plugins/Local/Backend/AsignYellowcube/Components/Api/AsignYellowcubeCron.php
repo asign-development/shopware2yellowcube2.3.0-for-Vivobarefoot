@@ -191,7 +191,7 @@ class AsignYellowcubeCron {
 
 		// get all the articles based on above condition...
 		$sSql = "SELECT art.id FROM s_articles AS art";
-		$sSql .= " JOIN s_articles_attributes AS attr ON art.id = attr.articleID";
+		$sSql .= " JOIN s_articles_attributes AS attr ON art.id = attr.articledetailsID";
 		$sSql .= " WHERE attr.yc_export = 1";
 
 		// form where condition based on options...
@@ -228,7 +228,7 @@ class AsignYellowcubeCron {
 						}
 						// get the formatted article data
 						$oRequestData = $this->objYcubeCore->getYCFormattedArticleData( $aDetails, $sFlag );
-						$aResponse    = $this->objYcubeCore->insertArticleMasterData( $oRequestData );
+						$aResponse = $this->objYcubeCore->insertArticleMasterData($oRequestData, $sFlag);
 					} elseif ( $iStatusCode == 10 ) {
 //					} elseif ( $iStatusCode == 100 ) { //TODO veriy if the status here should be 100 and not 10
 						// get the status
