@@ -120,7 +120,11 @@ class AsignYellowcubeCore {
 			'Timestamp'     => (float) $this->generateTimestampValue(),//20141017000020,
 			'OperatingMode' => $this->oSoapApi->getSoapOperatingMode(),
 			'Version'       => $this->oSoapApi->getSoapVersion(),
-			'CommType'      => $this->oSoapApi->getCommType(),
+			/*
+             * Dated: 3-November-2020 (chat on slack timed at 3:14 German Time)
+             * the YC guys told Eric that [CommType] => SOAP is not part of their structures. And he have asked him directly regarding the files BAR,ART,WAB and WAR so thats why commenting CommType so that it does not appear in any of the file
+             * */
+			// 'CommType'      => $this->oSoapApi->getCommType(),
 		];
 
 		return $aParams;
@@ -504,8 +508,15 @@ class AsignYellowcubeCore {
 			return $sZipCode;
 		} else {
 			$sDocType      = $this->oSoapApi->getYCDocType();
-			$sDocMimeType  = $this->oSoapApi->getYCDocMimeType();
+			$sDocMimeType  = strtolower($this->oSoapApi->getYCDocMimeType());
 			$sOrderDocFlag = $this->oSoapApi->getYCOrderDocumentsFlag();
+
+			if(strtolower($sOrderDocFlag) == 'no') {
+			    $sOrderDocFlag = 0;
+            } else {
+			    $sOrderDocFlag = 1;
+            }
+
 			$sPickMessage  = '';
 			$sReturnReason = '';
 
