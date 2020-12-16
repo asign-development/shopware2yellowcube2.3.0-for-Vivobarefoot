@@ -45,8 +45,8 @@ class Shopware_Controllers_Widgets_AsignWidgetCube extends Enlight_Controller_Ac
      */
     public function triggerYellowcubeAction()
     {
-        // send orders automatically after checkout when manual send is set to 'Yes'
-        if ($this->oSoapApi->isManualSendAllowed()) {
+        // send orders automatically after checkout when manual send is set to 'No'
+        if (!$this->oSoapApi->isManualSendAllowed()) {
             // get order-nr since its the only value present
             $oSession = Shopware()->Session();
             $ordnr = $oSession['sOrderVariables']['sOrderNumber'];
