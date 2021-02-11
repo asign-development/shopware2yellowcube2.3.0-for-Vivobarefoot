@@ -111,7 +111,7 @@ class AsignYellowcubeCron
                     if (($iStatusCode == null || $iStatusCode == 101) && $this->objOrders->getFieldData($iOrdid, $sRequestField) == '') {
                         // execute the order object
                         if ($isCron) {
-                            echo "Submitting Order for OrderID: " . $iOrdid . "\n";
+                            // echo "Submitting Order for OrderID: " . $iOrdid . "\n";
                         }
                         $oDetails = $this->objOrders->getOrderDetails($iOrdid);
                         $aResponse = $this->objYcubeCore->createYCCustomerOrder($oDetails);
@@ -125,7 +125,7 @@ class AsignYellowcubeCron
                     } elseif ($iStatusCode < 100) {
                         // get the status
                         if ($isCron) {
-                            echo "Requesting WAB status for OrderID: " . $iOrdid . "\n";
+                            // echo "Requesting WAB status for OrderID: " . $iOrdid . "\n";
                         }
                         $aResponse = $this->objYcubeCore->getYCGeneralDataStatus($iOrdid, "WAB");
 
@@ -136,7 +136,7 @@ class AsignYellowcubeCron
                     } elseif ($iStatusCode == 100) {
                         // get the WAR status
                         if ($isCron) {
-                            echo "Requesting WAR status for OrderID: " . $iOrdid . "\n";
+                            // echo "Requesting WAR status for OrderID: " . $iOrdid . "\n";
                         }
                         $aResponse = $this->objYcubeCore->getYCGeneralDataStatus($iOrdid, "WAR");
 
@@ -254,7 +254,7 @@ class AsignYellowcubeCron
                     // execute the article object
                     if ($iStatusCode === null) {
                         if ($isCron) {
-                            echo "Submitting Article for Article-ID: " . $artid . "\n";
+                            // echo "Submitting Article for Article-ID: " . $artid . "\n";
                         }
                         // get the formatted article data
                         $oRequestData = $this->objYcubeCore->getYCFormattedArticleData($aDetails, $sFlag);
@@ -264,7 +264,7 @@ class AsignYellowcubeCron
 //					} elseif ( $iStatusCode == 100 ) { //TODO veriy if the status here should be 100 and not 10
                         // get the status
                         if ($isCron) {
-                            echo "Getting Article status for Article-ID: " . $artid . "\n";
+                            // echo "Getting Article status for Article-ID: " . $artid . "\n";
                         }
                         $aResponse = $this->objYcubeCore->getYCGeneralDataStatus($artid, "ART");
                     }
